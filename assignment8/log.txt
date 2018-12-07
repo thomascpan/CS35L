@@ -1,0 +1,71 @@
+Partners:
+Josh Iglesia
+Chanel Young
+
+Connected BeagleBone to computer using the USB cable.
+
+Find BEAGLEBONE as an external storage device and open it.
+
+Double-click on the "START.htm" file. Follow steps. Intalling Windows 64-bit driver failed. In order to get it to work, I had to restart my computer in troubleshooting mode, select startup settings, 
+and restart with "disable driver signature enforcement."
+https://www.howtogeek.com/167723/how-to-disable-driver-signature-verification-on-64-bit-windows-8.1-so-that-you-can-install-unsigned-drivers/
+
+Reinstall Windows 64-bit driver. This time succeeded.
+
+Install Putty. Start a session with "192.168.7.2" as hostname and "root" as username.
+
+$ sudo connmanctl
+connmanctl> enable wifi
+connmanctl> scan wifi
+connmanctl> services
+connmanctl> agent on
+connmanctl> connect wifi_2cf7f10678c1_54502d4c49e4b5f33313233_managed_psk
+connmanctl> quit
+
+Connect to wifi.
+
+$ sudo apt-get update
+$ sudo apt-get install openssh-server
+$ sudo apt-get install openssh-client
+$ sudo apt-get install xauth
+$ sudo apt-get install xvfb
+$ sudo apt-get install firefox-esr-l10n-en-gb
+
+Update apt-get.
+Install openssh-server, openssh-client, xauth, xvfb, and firefox.
+
+Edit /.ssh/config
+Set 'ForwardAgent yes' and 'ForwardX11 yes'.
+Set 'ForwardAgent yes' and 'ForwardX11 yes'.
+Edit /etc/ssh/sshd_config
+Set 'X11Forwarding yes'.
+
+$ sudo useradd -d /home/josh -m josh
+$ sudo passwd josh
+$ cd /home/josh
+$ sudo mkdir .ssh
+$ sudo chown -R josh .ssh
+$ sudo chmod 700 .ssh
+$ ifconfig
+$ ps aux | grep ssh
+
+Creates users and directories for partner(s). Create .ssh to store ssh information. Change permissions and owner. Get IP address for partners.
+
+$ ping 192.168.43.186
+$ ssh -X thomasp@192.168.43.186
+$ ssh-keygen
+$ ssh-copy-id -i thomasp@192.168.43.186
+$ ssh -X thomasp@192.168.43.186
+$ touch test.txt
+
+SSH onto partner(s) beaglebones with password and with X11 forwarding.
+Create public-private key pair. Pass public key to server. SSH onto partner(s) beaglebones without password and with X11 forwarding.
+Test to make sure I'm correctly connected to the server.
+
+$ firefox
+
+Verify that I can run firefox via X11 forwarding.
+
+$ ssh -Y thomasp@192.168.43.186
+
+Log onto partner(s) beaglebones with X11 trusted forwarding. Did not notice a difference, but this theoretically could open up security problems if not careful.

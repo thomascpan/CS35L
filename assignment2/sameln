@@ -1,0 +1,31 @@
+#! /bin/sh
+
+DIRECTORY=$1
+
+FILES=$(find $DIRECTORY -maxdepth 1 -type f | sort)
+
+for file1 in $FILES;
+do
+	filename1=$(basename $file1)
+	if test ! -r $file1;
+	then
+		echo "Can't read $filename1. Skipping file."
+	else
+		for file2 in $FILES;
+		do
+			filename2=$(basename $file2)
+			if test -r $file2 && [ "$filename1" != "$filename2" ];
+			then
+				if cmp -s $file1 $file2;
+				then
+					if [ "$filename1" \< "$filename2" ]
+					then
+						ln -f $file1 $file2
+					else
+						ln -f $file2 $file1
+					fi
+				fi
+			fi
+		done
+	fi
+done

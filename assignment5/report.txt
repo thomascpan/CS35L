@@ -1,0 +1,154 @@
+*LAB*
+1.
+I create the proram tr2b.c using getchar and putchar which uses a buffer.
+I broke the program up into 3 functions:
+findElement: finds an element in a list.
+testInputLength: tests to make sure both arguments are of equal length.
+testDuplicates: tests to make sure arguments don't have duplicate characters.
+tr2u.c: I used read and write, set to only read/write 1 byte. Thus, it is unbuffered. 
+
+2.
+I create the proram tr2u.c using read and write, and set it only to read/write 1 byte. Thus, it is unbuffered.
+I broke the program up into 3 functions:
+findElement: finds an element in a list.
+testInputLength: tests to make sure both arguments are of equal length.
+testDuplicates: tests to make sure arguments don't have duplicate characters.
+
+3.
+dd if=/dev/urandom of=bigfile.txt bs=1M count=5
+Create a large file with random information.
+
+strace -c -o trace.txt ./tr2b 12345 abcde < bigfile.txt > tr2b.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 44.96    0.000232           0       641           write
+ 17.25    0.000089           0       642           read
+ 12.98    0.000067           7         9           mmap
+  7.36    0.000038          10         4           mprotect
+  4.46    0.000023           6         4           fstat
+  3.49    0.000018           9         2           open
+  2.71    0.000014          14         1           munmap
+  1.74    0.000009           9         1         1 access
+  1.74    0.000009           9         1           execve
+  1.55    0.000008           4         2           close
+  0.97    0.000005           5         1           brk
+  0.78    0.000004           4         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000516                  1309         1 total
+
+strace -c -o trace.txt ./tr2u 12345 abcde < bigfile.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 55.52   21.052272           4   5242880           write
+ 44.48   16.868677           3   5242882           read
+  0.00    0.000028           7         4           mprotect
+  0.00    0.000027           4         7           mmap
+  0.00    0.000011          11         1           munmap
+  0.00    0.000009           5         2           open
+  0.00    0.000003           2         2           fstat
+  0.00    0.000002           1         2           close
+  0.00    0.000002           2         1           arch_prctl
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00   37.921031              10485784         1 total
+
+4.
+time ./tr2b 12345 abcde < bigfile.txt > tr2b.txt
+real  0m0.304s
+user  0m0.250s
+sys 0m0.009s
+
+time ./tr2u 12345 abcde < bigfile.txt
+real  0m11.165s
+user  0m1.468s
+sys 0m9.648s
+
+
+Measuring the time, we can see that tr2u runs much slower than the 2r2b. From the strace files, we can see that tr2u calls the syscalls read and write about 8000x more than tr2b. This makes sense 
+since tr2u is unbuffered.
+
+*HOMEWORK*
+10000 lines | 550000 bytes | 1140594 comparisons
+
+time ./sfrob < file1.txt > temp.txt
+real	0m0.064s
+user	0m0.050s
+sys	0m0.006s
+
+time ./sfrobu < file1.txt > temp.txt
+real	0m0.136s
+user	0m0.042s
+sys	0m0.088s
+
+time ./sfrobu -f < file1.txt > temp.txt
+real	0m0.146s
+user	0m0.055s
+sys	0m0.084s
+
+time ./sfrobs < file1.txt > temp.txt
+real	0m0.046s
+user	0m0.024s
+sys	0m0.014s
+
+time ./sfrobs -f < file1.txt > temp.txt
+real	0m0.052s
+user	0m0.042s
+sys	0m0.008s
+
+
+100000 lines | 5500000 bytes | 13922941 comparisons
+
+time ./sfrob < file2.txt > temp.txt
+real	0m0.647s
+user	0m0.560s
+sys	0m0.039s
+
+time ./sfrobu < file2.txt > temp.txt
+real	0m1.439s
+user	0m0.420s
+sys	0m0.972s
+
+time ./sfrobu -f < file2.txt > temp.txt
+real	0m1.578s
+user	0m0.556s
+sys	0m0.974s
+
+time ./sfrobs < file2.txt > temp.txt
+real	0m0.354s
+user	0m0.274s
+sys	0m0.049s
+
+time ./sfrobs -f < file2.txt > temp.txt
+real	0m0.522s
+user	0m0.458s
+sys	0m0.041s
+
+
+1600000 lines | 88000000 bytes | 270766865 comparison
+
+time ./sfrob < file3.txt > temp.txt
+real	0m12.945s
+user	0m11.256s
+sys	0m0.952s
+
+time ./sfrobu < file3.txt > temp.txt
+real	0m27.425s
+user	0m9.403s
+sys	0m17.286s
+
+time ./sfrobu -f < file3.txt > temp.txt
+real	0m27.561s
+user	0m11.228s
+sys	0m15.592s
+
+time ./sfrobs < file3.txt > temp.txt
+real	0m6.076s
+user	0m5.058s
+sys	0m0.621s
+
+time ./sfrobs -f < file3.txt > temp.txt
+real	0m9.190s
+user	0m8.194s
+sys	0m0.602s

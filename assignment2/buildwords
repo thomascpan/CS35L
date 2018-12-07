@@ -1,0 +1,12 @@
+#! /bin/sh
+
+sed '/<!DOCTYPE/, /Adopt<\/td>/d' |     # delete beggining
+sed '/<\/table>/, /<\/html>/d' |        # delete end
+sed '/<\/tr>/, /<\/td>/d' |             # delete english words
+sed 's/<[^>]*>//g' |                    # delete html tags
+sed "s/\`/\'/g" |                       # replace ` with '
+tr [:upper:] [:lower:] |                # convert to lowercase
+tr ', ' '\n' |                          # replace commas and spaces with newlines
+sed '/^[[:space:]]*$/d' |               # remove empty lins
+sed "/[^pk\'mnwlhaeiou]/d" |            # remove words containining non-hawaiian letters
+sort -u                                 # sort and unique

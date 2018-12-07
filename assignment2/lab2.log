@@ -1,0 +1,34 @@
+locale
+export LC_ALL='C'
+locale
+cat /usr/share/dict/words
+sort /usr/share/dict/words
+sort /user/share/dict/words >> words
+cat words
+curl https://web.cs.ucla.edu/classes/fall18/cs35L/assign/assign2.txt
+
+tr -c 'A-Za-z' '[\n*]' < assign2.txt
+It removes all non-alphabetical characters and replaces them with newlines.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt
+It removes all non-alphabetical characters, replaces wthem with newlines, and merges all consecutive repeats into one instance.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort
+It removes all non-alphabetical characters, replaces wthem with newlines, merges all consecutive repeats into one instance.
+It then sorts the results.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u
+It removes all non-alphabetical characters, replaces wthem with newlines, merges all consecutive repeats into one instance.
+It then sorts the results and remove all duplicates. 
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u | comm - words
+It removes all non-alphabetical characters, replaces wthem with newlines, merges all consecutive repeats into one instance.
+It then sorts the results and remove all duplicates.
+It then compares the results with 'words'. It prints out words unique to the result, words unique to 'words', and words that appear in both.
+
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u | comm -23 - words
+It removes all non-alphabetical characters, replaces wthem with newlines, merges all consecutive repeats into one instance.
+It then sorts the results and remove all duplicates. 
+It then compares the results with 'words'. It prints out words unique to the result.
+

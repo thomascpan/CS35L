@@ -1,0 +1,124 @@
+wget 
+https://web.cs.ucla.edu/classes/fall18/cs35L/assign/coreutils-with-bug.tar.gz
+Download coreutils-with-bug.
+
+tar -xvzf coreutils-with-bug.tar.gz
+Untar coreutils-with-bug.
+
+cd coreutils-with-bug/
+./configure --prefix=/u/cs/grad/thomasp/Documents/cs35L/hw/hw4
+make
+
+Configure and attemp to make coreutils-with-bug. However, we encounter the 
+following error:
+	In file included from utimecmp.c:41:0:
+	utimens.h:2:5: error: conflicting types for 'futimens'
+	 int futimens (int, char const *, struct timespec const [2]);
+	     ^
+	In file included from utimecmp.h:25:0,
+	                 from utimecmp.c:25:
+	/usr/include/sys/stat.h:373:12: note: previous declaration of 
+'futimens' was here
+	 extern int futimens (int __fd, const struct timespec __times[2]) 
+__THROW;
+	            ^
+There is an error due to conflictings types for the function 'futimens.'
+
+cd ..
+wget https://web.cs.ucla.edu/classes/fall18/cs35L/assign/coreutils.diff
+cd coreutils-with-bug/
+patch -p0 < ../coreutils.diff
+Download the patch. Apply patch to fix the issue caused by the conflicting data 
+types. The patch solved the problem by creating a new method called 
+coreutils_futimens. 
+
+make
+make install
+Finish "make" after applying the patch and install it into our directory.
+
+
+tmp=$(mktemp -d)
+cd $tmp
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+TZ=UTC0 ~/Documents/cs35L/hw/hw4/bin/ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 thomasp csgrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 thomasp csgrad 0 2018-10-30 17:41:52.543632331 +0000 now1
+-rw-r--r-- 1 thomasp csgrad 0 2018-10-30 17:41:42.016263413 +0000 now
+Reproduced the bug.
+
+gdb ~/Documents/cs35L/hw/hw4/bin/ls
+break sort_files
+break qsort
+r ~/Documents/cs35L/hw/hw4/bin/ls -lt --full-time wwi-armistice now now1
+print *(files+0)
+print *(files+1)
+print *(files+2)
+
+
+I looked into at the ls source code for clues as to what functions to set a 
+breakpoint on gdb. I find a function called sort_files and set a breakpoint. As 
+I execute the code, I step into a series of 
+functions: qsort, compare_mtime, cmp_mtime, and eventually timespec_cmp. It is 
+here that I discovered the logic of what is actuallying being done to compare 
+the files. After discovering this code, I 
+start printing out some of the files and notice that 'www-armistice' has a 
+'tv_sec' of '-1613826000.' After testing the code, I realize the subtraction 
+logic in timspec_cmp is causing an overflow 
+resulting in files that are sorted in the wrong order. In order to solve this 
+problem, I make the following modifications:
+static inline int
+timespec_cmp (struct timespec a, struct timespec b)
+{
+  int result = a.tv_sec > b.tv_sec;
+  result = result ? result : (a.tv_sec == b.tv_sec ? 0 : -1);
+  result = !result ? (a.tv_nsec > b.tv_nsec) : result;
+  result = result ? result : (a.tv_nsec == b.tv_nsec ? 0 : -1);
+  return result;
+}
+This code uses comparators instead of subtraction so that overflows are 
+avoided. I remake my code, rerun the ls command, and the bug is fixed. 
+
+diff -u coreutils-with-bug/lib/timespec.h coreutils-with-bug/lib/timespec_new.h 
+> patch.diff
+emacs
+C-x 4 a
+cat ChangeLog patch.diff > lab4.diff
+patch -p0 < lab4.diff
+cd coreutils-with-bug/
+make
+make install
+
+Create patch by creating diff file, add Changelog via emacs, apply patch, and 
+remake coreutils. 
+
+tmp=$(mktemp -d)
+cd $tmp
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+TZ=UTC0 ~/Documents/cs35L/hw/hw4/bin/ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 thomasp csgrad 0 2018-11-03 04:00:37.997005581 +0000 now1
+-rw-r--r-- 1 thomasp csgrad 0 2018-11-03 04:00:33.342877408 +0000 now
+-rw-r--r-- 1 thomasp csgrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+
+Rerun code to see if bug is fixed, and it is. 
+
+cd $home
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 thomasp csgrad 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 thomasp csgrad 0 2018-11-03 04:05:43.582809000 +0000 now1
+-rw-r--r-- 1 thomasp csgrad 0 2018-11-03 04:05:39.277414000 +0000 now
+
+Rerun command in home directory. It does not seem to work in the directory. Now 
+'wwi-armistice' is now shown as '2054.' I suspected this error is also caused 
+by some overflow. I was given a hint that the tmp folder uses a local the local 
+file system. Apparently, our home directory is uses a NFS system that uses 32 
+bits. This results in a timestamp that is in the future.

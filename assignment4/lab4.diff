@@ -1,0 +1,16 @@
+2018-11-02  Thomas Pan  <thomasp@lnxsrv07.seas.ucla.edu>
+
+	* lib/timespec.h
+	* Fixed overflow bug. Use comparison instead of subtraction.
+
+--- coreutils-with-bug/lib/timespec.h	2018-11-02 20:53:02.265173000 -0700
++++ coreutils-with-bug/lib/timespec_new.h	2018-11-02 20:38:48.339497000 -0700
+@@ -46,6 +46,8 @@
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+   int result = a.tv_sec > b.tv_sec;
++  result = result ? result : (a.tv_sec == b.tv_sec ? 0 : -1);
++  result = !result ? (a.tv_nsec > b.tv_nsec) : result;
+   result = result ? result : (a.tv_nsec == b.tv_nsec ? 0 : -1);
+   return result;
+ }

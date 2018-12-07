@@ -1,0 +1,33 @@
+1.
+
+2.
+
+3.
+Traceback (most recent call last):
+  File "randline.py", line 70, in <module>
+    main()
+  File "randline.py", line 64, in main
+    sys.stdout.write(generator.chooseline())
+  File "randline.py", line 34, in chooseline
+    return random.choice(self.lines)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/random.py", line 275, in choice
+    return seq[int(self.random() * len(seq))]  # raises IndexError if seq is empty
+IndexError: list index out of range
+
+random.choice returns an error when the index is out of range.
+Reading an empty file returns an empty array.
+
+4.
+File "randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax
+
+In Python 2, exceptions were iterable, so it was possible to “unpack” the arguments of an exception as part of the except statement:
+
+	except RuntimeError as (num, message):
+	
+In Python 3, this is no longer true, and the arguments must be accessed through the args attribute:
+
+	except RuntimeError as e:
+	    num, message = e.args
