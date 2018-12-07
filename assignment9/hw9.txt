@@ -1,0 +1,50 @@
+2.
+$ git clone https://git.savannah.gnu.org/git/diffutils.git diffutils-hw
+$ cd diffutils-hw
+$ git checkout v3.0 -b quote
+Reclone into a new directory because unstaged changes are still on the old directory. 
+Checkout v3.0 and create new branch called "quote."
+
+3.
+$ patch -p1 < ../quote-3.0-patch.txt
+Apply patch to new branch.
+
+4 - 5. 
+$ emacs
+(emacs) C-x 4 a
+(emacs) C-x c
+(emacs) y
+Add a changelog adapted from the original patch.
+
+6.
+$ git add -A
+$ git commit -F ChangeLog
+Add changes and commit with message from ChangeLog. 
+
+7.
+$ git format-patch -1 --stdout > formatted-patch.txt
+Create a formatted patch file. 
+
+8.
+$ git checkout v3.0 -b partner
+$ git am < ../partner-patch.txt
+$ ./bootstrap
+$ ./configure
+$ make
+$ make check
+Checkout v3.0 and create new branch called "partner."
+Follow instructions in README-hacking.
+
+9. 
+$ make distdir
+$ cd diffutils-3.0.1-dff7/
+$ more ChangeLog
+Run "make distdir," and check Changelog. Changelog is updated as expected.
+
+10.
+$ ssh -Y thomasp@lnxsrv06.seas.ucla.edu
+$ cd ~eggert/src/gnu/emacs
+$ gitk
+ssh into seasnet with X11 forwarding and run gitk.
+xQuartz opens up with a gui of gitk. 
+Find newest merge before 2015-01-25, and take a screenshot.

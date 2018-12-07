@@ -1,0 +1,14 @@
+Top Left.
+Commit history of the repository. 
+
+Top Middle.
+Authors of commits. 
+
+Top Right.
+Timestamp of commits. 
+
+Bottom Left.
+Commit details and diff. 
+
+Bottom right.
+List of files impacted by commit.
