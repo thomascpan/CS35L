@@ -1,0 +1,33 @@
+$ sort --version
+sort (GNU coreutils) 8.30
+
+Check if the sort version I have is new enough. 
+
+$ od -An -t fF -N 67108864 < /dev/urandom | tr -s [:blank:] '\n' | sed '/^$/d' > random.txt
+Generate a file containing 2^24 random single precision floating point numbers. 
+(2^24)*4 = 67108864 bytes. Multiply by 4 to get enough bytes for (2^24) floats.
+
+$ time -p sort -g random.txt > /dev/null
+real 34.82
+user 190.84
+sys 0.90
+
+$ time -p sort -g --parallel=1 random.txt > /dev/null
+real 178.60
+user 178.11
+sys 0.47
+
+$ time -p sort -g --parallel=2 random.txt > /dev/null
+real 93.75
+user 178.28
+sys 0.50
+
+$ time -p sort -g --parallel=4 random.txt > /dev/null
+real 54.84
+user 183.14
+sys 0.67
+
+$ time -p sort -g --parallel=8 random.txt > /dev/null
+real 34.86
+user 191.69
+sys 0.93
